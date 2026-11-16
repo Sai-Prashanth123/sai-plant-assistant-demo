@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Amulya Farms · Plant Care Assistant: Interactive Prototype</title>
+<style>
+  :root{
+    --forest:#16352a; --forest-2:#1f4a39; --leaf:#3f7d5c; --sage:#e7efe9; --cream:#f8f5ef;
+    --copper:#b8733e; --copper-2:#d79a63; --ink:#1c2621; --muted:#66746c; --line:#e4e8e3;
+    --wa-bg:#efeae2; --wa-out:#dcf3e1;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Segoe UI",-apple-system,Roboto,Helvetica,Arial,sans-serif;background:var(--cream);color:var(--ink);-webkit-font-smoothing:antialiased}
+  .serif{font-family:Georgia,"Times New Roman",serif}
+
+  /* hero */
+  .hero{background:radial-gradient(1200px 400px at 85% -10%,rgba(215,154,99,.25),transparent 60%),linear-gradient(135deg,var(--forest) 0%,var(--forest-2) 100%);color:#fff;padding:34px 48px 90px}
+  .nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:34px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .mark{width:42px;height:42px;border-radius:12px;background:linear-gradient(140deg,var(--copper-2),var(--copper));display:grid;place-items:center;font-size:22px;box-shadow:0 6px 18px rgba(184,115,62,.4)}
+  .brand b{display:block;font-size:16px;letter-spacing:.3px}
+  .brand span{font-size:12px;opacity:.7;letter-spacing:1.4px;text-transform:uppercase}
+  .tag{border:1px solid rgba(255,255,255,.25);padding:6px 14px;border-radius:30px;font-size:12px;letter-spacing:.5px;background:rgba(255,255,255,.06)}
+  .hero h1{font-size:38px;font-weight:400;line-height:1.15;max-width:720px}
+  .hero h1 em{color:var(--copper-2);font-style:italic}
+  .hero p{margin-top:12px;max-width:620px;opacity:.82;font-size:15px;line-height:1.6}
+  .chips{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+  .chips span{font-size:12px;padding:6px 12px;border-radius:20px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14)}
+
+  main{display:grid;grid-template-columns:400px 1fr;gap:32px;padding:0 48px 40px;margin-top:-60px;max-width:1280px;margin-left:auto;margin-right:auto}
+  @media(max-width:1000px){main{grid-template-columns:1fr;justify-items:center}.hero{padding:28px 22px 80px}main{padding:0 18px 30px}}
+
+  /* phone */
+  .phone-wrap{position:sticky;top:20px;align-self:start}
+  .phone{width:380px;height:770px;background:#0d0f0e;border-radius:52px;padding:12px;box-shadow:0 40px 80px rgba(22,53,42,.35),inset 0 0 0 2px #2a2d2b}
+  .screen{width:100%;height:100%;border-radius:42px;overflow:hidden;display:flex;flex-direction:column;background:var(--wa-bg);position:relative}
+  .notch{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:110px;height:28px;background:#0d0f0e;border-radius:20px;z-index:3}
+  .wa-top{background:var(--forest);color:#fff;padding:46px 16px 12px;display:flex;align-items:center;gap:11px}
+  .avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(140deg,var(--copper-2),var(--copper));display:grid;place-items:center;font-size:20px}
+  .wa-top .name{font-weight:600;font-size:15px;display:flex;align-items:center;gap:5px}
+  .verified{width:15px;height:15px;border-radius:50%;background:#25d366;display:inline-grid;place-items:center;font-size:9px;color:#fff}
+  .wa-top .status{font-size:11.5px;opacity:.75}
+  .chat{flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:7px;
+        background-color:var(--wa-bg);background-image:radial-gradient(rgba(22,53,42,.05) 1px,transparent 1px);background-size:14px 14px}
+  .chat::-webkit-scrollbar{width:0}
+  .msg{max-width:84%;padding:8px 11px 6px;border-radius:12px;font-size:13.5px;line-height:1.45;box-shadow:0 1px 1.5px rgba(0,0,0,.1);white-space:pre-line;animation:pop .28s ease}
+  .bot{background:#fff;align-self:flex-start;border-top-left-radius:3px}
+  .user{background:var(--wa-out);align-self:flex-end;border-top-right-radius:3px}
+  .sys{align-self:center;background:rgba(255,255,255,.85);font-size:11px;color:var(--muted);padding:4px 11px;border-radius:8px;text-align:center;max-width:90%;letter-spacing:.2px;backdrop-filter:blur(4px)}
+  .tmpl{border-left:3px solid var(--copper)}
+  .tmpl small{display:block;color:var(--copper);font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:3px}
+  .time{display:block;text-align:right;font-size:10px;color:#93a097;margin-top:2px}
+  .photo{width:170px;height:118px;border-radius:9px;margin-bottom:5px;position:relative;overflow:hidden;
+         background:linear-gradient(160deg,#9cc46b 0%,#6e9e4a 35%,#c9b25a 62%,#a0703f 100%)}
+  .photo:after{content:attr(data-l);position:absolute;bottom:6px;left:8px;color:#fff;font-size:10.5px;font-weight:600;text-shadow:0 1px 3px rgba(0,0,0,.4)}
+  .conf{display:inline-block;background:var(--sage);color:var(--forest-2);font-size:11px;font-weight:700;padding:3px 9px;border-radius:10px;margin-top:5px}
+  .conf.low{background:#fbeee2;color:#9a5320}
+  .typing{align-self:flex-start;background:#fff;padding:9px 14px;border-radius:12px;display:flex;gap:4px}
+  .typing i{width:6px;height:6px;border-radius:50%;background:#a7b3ab;animation:blink 1s infinite}
+  .typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+  .replies{background:#f6f7f5;padding:10px 10px 18px;display:flex;flex-wrap:wrap;gap:7px;min-height:64px;border-top:1px solid #e3e6e2}
+  .replies button{border:1px solid var(--leaf);background:#fff;color:var(--forest-2);border-radius:20px;padding:8px 13px;font-size:12.5px;cursor:pointer;font-weight:600;transition:.15s}
+  .replies button:hover{background:var(--forest);color:#fff;border-color:var(--forest)}
+
+  /* right column */
+  .col{display:flex;flex-direction:column;gap:22px;min-width:0}
+  .card{background:#fff;border-radius:20px;padding:24px 26px;box-shadow:0 10px 30px rgba(22,53,42,.07);border:1px solid var(--line)}
+  .eyebrow{font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:var(--copper);font-weight:700;margin-bottom:6px}
+  .card h2{font-size:22px;font-weight:400;color:var(--forest);margin-bottom:10px}
+  .card p,.card li{font-size:14px;line-height:1.65;color:#46524b}
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:6px}
+  @media(max-width:700px){.steps{grid-template-columns:repeat(2,1fr)}}
+  .step{background:var(--sage);border-radius:14px;padding:14px}
+  .step b{display:block;font-size:22px;margin-bottom:4px}
+  .step span{font-size:12.5px;color:var(--forest-2);font-weight:600}
+  .restart{margin-top:14px;border:none;background:var(--forest);color:#fff;border-radius:10px;padding:10px 16px;cursor:pointer;font-size:13px;font-weight:600}
+  .restart:hover{background:var(--forest-2)}
+  .qr{display:flex;gap:20px;align-items:center}
+  .qrcard{width:150px;flex-shrink:0;background:var(--cream);border:1px solid var(--line);border-radius:14px;padding:14px;text-align:center}
+  .qrcard .code{width:92px;height:92px;margin:0 auto 8px;display:grid;grid-template-columns:repeat(9,1fr);gap:1px}
+  .qrcard .code i{background:var(--forest);border-radius:1px}
+  .qrcard .code i.o{background:transparent}
+  .qrcard small{font-size:10.5px;color:var(--muted);display:block}
+  .qrcard strong{font-size:12px;color:var(--forest)}
+
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:6px 0 18px}
+  @media(max-width:700px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  .kpi{border:1px solid var(--line);border-radius:14px;padding:14px 14px 12px}
+  .kpi b{display:block;font-size:26px;font-weight:400;color:var(--forest)}
+  .kpi span{font-size:11.5px;color:var(--muted)}
+  .kpi em{font-style:normal;font-size:11px;color:var(--leaf);font-weight:700}
+  .tablewrap{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:13px;min-width:540px}
+  th{text-align:left;padding:9px 8px;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line);font-weight:700}
+  td{padding:11px 8px;border-bottom:1px solid #f0f2ef}
+  .pill{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:700;white-space:nowrap}
+  .pill.open{background:#fbeee2;color:#9a5320}.pill.ok{background:var(--sage);color:var(--forest-2)}.pill.no{background:#f6e5e3;color:#8f2d22}
+  .act button{border:none;border-radius:8px;padding:6px 11px;font-size:12px;cursor:pointer;margin-right:5px;font-weight:700}
+  .ap{background:var(--forest);color:#fff}.de{background:#eef0ed;color:#3b463f}
+  .new{animation:flash 1.6s ease}
+  .note{margin-top:12px;font-size:12.5px;color:var(--muted);display:flex;gap:8px;align-items:flex-start}
+  .bars div{display:grid;grid-template-columns:130px 1fr 44px;align-items:center;gap:10px;font-size:13px;margin:9px 0}
+  .bar{height:9px;background:#eef1ee;border-radius:6px;overflow:hidden}
+  .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--leaf),var(--copper-2));border-radius:6px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  @media(max-width:800px){.grid2{grid-template-columns:1fr}}
+  .ticks li{list-style:none;padding-left:26px;position:relative;margin:7px 0}
+  .ticks li:before{content:"✓";position:absolute;left:0;top:0;width:18px;height:18px;border-radius:50%;background:var(--sage);color:var(--forest-2);font-size:11px;font-weight:800;display:grid;place-items:center}
+  footer{text-align:center;font-size:12.5px;color:var(--muted);padding:6px 0 34px}
+  footer b{color:var(--forest)}
+  @keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  @keyframes blink{0%,100%{opacity:.3}50%{opacity:1}}
+  @keyframes flash{0%{background:#fbeee2}100%{background:transparent}}
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="nav">
+    <div class="brand"><div class="mark">🎋</div><div><b>Amulya Farms &amp; Nursery</b><span>Plant Care Assistant</span></div></div>
+    <div class="tag">Interactive prototype · sample data</div>
+  </div>
+  <h1 class="serif">Every plant you deliver gets a <em>caretaker</em> on WhatsApp.</h1>
+  <p>Customers scan the card in the box, tell us where the plant lives, and get a month of tips, answers to their questions and photo checks. Complaints come straight to your team.</p>
+  <div class="chips"><span>WhatsApp Cloud API</span><span>Answers from your care guides</span><span>Human hand-off</span><span>Team dashboard</span></div>
+</section>
+
+<main>
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="screen">
+        <div class="notch"></div>
+        <div class="wa-top">
+          <div class="avatar">🎋</div>
+          <div><div class="name">Amulya Farms Plant Care <span class="verified">✓</span></div><div class="status">Usually replies instantly</div></div>
+        </div>
+        <div class="chat" id="chat"></div>
+        <div class="replies" id="replies"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="card">
+      <div class="eyebrow">Try it</div>
+      <h2 class="serif">Play the customer: tap the replies in the phone</h2>
+      <div class="steps">
+        <div class="step"><b>📲</b><span>Scan &amp; welcome</span></div>
+        <div class="step"><b>🌤️</b><span>30 days of tips</span></div>
+        <div class="step"><b>📷</b><span>Photo check</span></div>
+        <div class="step"><b>📦</b><span>Report a problem</span></div>
+      </div>
+      <button class="restart" onclick="start()">↺ Restart the demo</button>
+    </div>
+
+    <div class="card">
+      <div class="eyebrow">Step 1</div>
+      <h2 class="serif">One QR code per plant</h2>
+      <div class="qr">
+        <div class="qrcard"><div class="code" id="qr"></div><strong>Lucky Bamboo</strong><small>Scan for care tips</small></div>
+        <p>Each plant's care card carries its own QR code. Scanning it opens WhatsApp with the plant already filled in: <b>"Hi, I got my Lucky Bamboo 🎋"</b>. Customers type nothing, and we know exactly which plant to care for. The first version covers your 5 launch plants.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="eyebrow">Your team's screen</div>
+      <h2 class="serif">Customers, chats and complaints in one place</h2>
+      <div class="kpis">
+        <div class="kpi"><b>128</b><span>Sign-ups this month</span><br><em>▲ 24%</em></div>
+        <div class="kpi"><b>91%</b><span>Still receiving tips</span></div>
+        <div class="kpi"><b>14</b><span>Photo checks</span></div>
+        <div class="kpi"><b id="openCount">2</b><span>Complaints to review</span></div>
+      </div>
+      <div class="tablewrap">
+      <table>
+        <thead><tr><th>Ref</th><th>Customer</th><th>Issue</th><th>Status</th><th>Decision</th></tr></thead>
+        <tbody id="complaints">
+          <tr><td>AMF-1042</td><td>Priya · Pune</td><td>Lucky Bamboo: stems broken</td><td><span class="pill open">To review</span></td><td class="act"><button class="ap" onclick="decide(this,true)">Approve</button><button class="de" onclick="decide(this,false)">Decline</button></td></tr>
+          <tr><td>AMF-1039</td><td>Rahul · Hyderabad</td><td>Wrong plant received</td><td><span class="pill open">To review</span></td><td class="act"><button class="ap" onclick="decide(this,true)">Approve</button><button class="de" onclick="decide(this,false)">Decline</button></td></tr>
+          <tr><td>AMF-1031</td><td>Neha · Delhi</td><td>Copper pot dented</td><td><span class="pill ok">Replaced</span></td><td style="color:var(--muted);font-size:12px">Customer notified</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="note">🔒 The assistant never promises a refund or replacement. Only your team approves here, and the customer is told automatically.</div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="eyebrow">Reports</div>
+        <h2 class="serif">What customers struggle with</h2>
+        <div class="bars">
+          <div><span>Yellow leaves</span><div class="bar"><i style="width:76%"></i></div><b>38%</b></div>
+          <div><span>Water changes</span><div class="bar"><i style="width:46%"></i></div><b>23%</b></div>
+          <div><span>Low light</span><div class="bar"><i style="width:30%"></i></div><b>15%</b></div>
+          <div><span>Transit damage</span><div class="bar"><i style="width:24%"></i></div><b>12%</b></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="eyebrow">How it's built</div>
+        <h2 class="serif">Safe, official and careful</h2>
+        <ul class="ticks">
+          <li><b>Official WhatsApp Cloud API</b>, so there's no ban risk</li>
+          <li><b>Tips sent as Meta-approved templates</b>, which is required after WhatsApp's 24-hour window</li>
+          <li><b>Answers only from your care guides</b></li>
+          <li><b>Photo checks show a confidence level</b>; unsure cases go to a person</li>
+          <li><b>PAUSE / STOP honoured instantly</b></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>Prototype designed &amp; built by <b>Sai Prashanth</b> · AI Engineer · github.com/Sai-Prashanth123 · Sample data only, not connected to WhatsApp</footer>
+
+<script>
+/* decorative QR */
+(function(){const q=document.getElementById('qr');const p="111110111100010001101110101101110101100010001111110111000000000101010110110011101011100111110010101";for(let i=0;i<81;i++){const c=document.createElement('i');if(p[i]!=='1')c.className='o';q.appendChild(c);}})();
+
+const chat=document.getElementById('chat'), replies=document.getElementById('replies');
+let t=9*60+12;
+const clock=()=>{t+=1;const h=Math.floor(t/60)%24,m=t%60;return (h%12||12)+':'+String(m).padStart(2,'0')+(h<12?' am':' pm');};
+function add(html,cls){const d=document.createElement('div');d.className='msg '+cls;d.innerHTML=html+'<span class="time">'+clock()+(cls.includes('user')?' ✓✓':'')+'</span>';chat.appendChild(d);chat.scrollTop=chat.scrollHeight;}
+function sys(text){const d=document.createElement('div');d.className='sys';d.textContent=text;chat.appendChild(d);chat.scrollTop=chat.scrollHeight;}
+function bot(html,after){const ty=document.createElement('div');ty.className='typing';ty.innerHTML='<i></i><i></i><i></i>';chat.appendChild(ty);chat.scrollTop=chat.scrollHeight;setTimeout(()=>{ty.remove();add(html,'bot');after&&after();},750);}
+function options(list){replies.innerHTML='';list.forEach(([label,fn])=>{const b=document.createElement('button');b.textContent=label;b.onclick=()=>{replies.innerHTML='';add(label,'user');setTimeout(fn,300);};replies.appendChild(b);});}
+
+function start(){chat.innerHTML='';replies.innerHTML='';t=9*60+12;
+  sys('Customer scans the QR code on the Lucky Bamboo care card');
+  options([['Hi, I got my Lucky Bamboo 🎋',welcome]]);}
+function welcome(){bot('Namaste, and welcome to Amulya Farms! 🌿\nWe\'re so glad your Lucky Bamboo reached you safely.\n\nWhere will it live?',()=>options([
+  ['🛋️ Living room',()=>placed('your living room')],
+  ['💼 Office desk',()=>placed('your office desk')],
+  ['🍳 Kitchen',()=>placed('your kitchen')]]));}
+function placed(where){bot('Lovely: Lucky Bamboo does well in '+where+' with bright, indirect light. ✨\n\nFor the next 30 days I\'ll send you short care tips. Reply PAUSE or STOP anytime.\n\n<b>Day 1 tip:</b> keep the roots covered with clean water, and avoid direct afternoon sun.',menu);}
+function menu(){options([['📅 Upcoming tips',tips],['❓ Ask a question',ask],['📷 Send a photo',photo],['📦 Report a problem',damage],['⏸️ PAUSE',pause]]);}
+function tips(){
+  sys('Day 7 · WhatsApp-approved template');add('<small>CARE TIP · DAY 7</small>Time to change the water 💧 Use filtered or tap water left out overnight, so the chlorine fades.','bot tmpl');
+  setTimeout(()=>{sys('Day 14 · template');add('<small>CARE TIP · DAY 14</small>Wipe the copper pot and pebbles. Clean water keeps the roots white and healthy. ✨','bot tmpl');},500);
+  setTimeout(()=>{sys('Day 30 · template');add('<small>CARE TIP · DAY 30</small>One month together! 🎉 Add one drop of liquid fertiliser this month. How is your bamboo looking?','bot tmpl');menu();},1000);}
+function ask(){options([['Why are the leaves turning yellow?',()=>bot('Yellow leaves on Lucky Bamboo usually come from <b>too much direct sun</b> or <b>chlorine in the water</b>.\n\n✅ Move it to bright, indirect light\n✅ Change the water every 7–10 days\n✂️ Trim yellow leaves with clean scissors\n\n<i>From the Amulya Farms Lucky Bamboo care guide</i>',menu)]]);}
+function photo(){add('<div class="photo" data-l="📷 stem_closeup.jpg"></div>','user');
+  bot('Thanks for the photo! Taking a look… 🔍',()=>bot('This <b>looks like early stem rot</b>: a soft, darker patch just above the waterline.\n<span class="conf">Confidence 78%</span>\n\nWhat to do:\n1. Take the stem out and rinse the roots\n2. Cut below the soft part with clean scissors\n3. Use fresh water and a clean pot\n\nIs the stem soft or mushy when you press it?',()=>options([
+    ['Yes, it\'s mushy',()=>bot('Thank you, this needs an expert eye. <span class="conf low">Passed to our plant expert</span>\n\nSomeone from our team will reply in this chat shortly. 👩‍🌾',()=>{sys('Chat handed over to the Amulya Farms team');menu();})],
+    ['No, it feels firm',()=>bot('Great news, then fresh water should fix it. I\'ll check in with you in a week. 🌱',menu)]])));}
+function damage(){bot('We\'re sorry about that 😟 What happened?',()=>options([['Stems broken in delivery',()=>report('Stems broken in delivery')],['I received the wrong plant',()=>report('Wrong plant received')]]));}
+function report(kind){bot('Please send a photo of the plant and the box 📸',()=>options([['📷 Send photo',()=>{add('<div class="photo" data-l="📷 box_and_plant.jpg"></div>','user');
+  bot('Thank you. Your reference number is <b>AMF-1043</b>.\n\nOur team will review it and reply here within 24 hours. We\'ll confirm any replacement after the review. 🙏',()=>{addComplaint(kind);menu();});}]]));}
+function pause(){bot('Done: care tips are paused ⏸️\nYou can still message us anytime.\n\nReply RESUME to restart.',()=>options([['RESUME',()=>bot('Welcome back! Your tips are on again 🌿',menu)]]));}
+function addComplaint(kind){const tb=document.getElementById('complaints');const tr=document.createElement('tr');tr.className='new';
+  tr.innerHTML='<td><b>AMF-1043</b></td><td>You · demo</td><td>Lucky Bamboo: '+kind.toLowerCase()+'</td><td><span class="pill open">To review</span></td><td class="act"><button class="ap" onclick="decide(this,true)">Approve</button><button class="de" onclick="decide(this,false)">Decline</button></td>';
+  tb.prepend(tr);const c=document.getElementById('openCount');c.textContent=+c.textContent+1;}
+function decide(btn,ok){const tr=btn.closest('tr');tr.children[3].innerHTML=ok?'<span class="pill ok">Replacement approved</span>':'<span class="pill no">Declined</span>';
+  tr.children[4].innerHTML='<span style="color:var(--muted);font-size:12px">Customer notified</span>';const c=document.getElementById('openCount');c.textContent=Math.max(0,+c.textContent-1);}
+start();
+</script>
+</body>
+</html>
